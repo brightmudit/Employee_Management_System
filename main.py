@@ -15,17 +15,19 @@ class EmployeeManagement:
         s = ttk.Style()
         s.configure('mainframe.TFrame', background='red')
         s.configure('dashboard.TFrame', background='blue')
+        s.configure('admin.TFrame', background='green')
         s.configure('admin.TButton', font=('Times New Roman', 15))
         s.configure('employee.TButton', font=('Times New Roman', 15))
-
 
         # Creating main frame
         self.mainframe = ttk.Frame(root, style='mainframe.TFrame')
         # Dasboard frame
         self.dashboard = ttk.Frame(root, style='dashboard.TFrame')
+        # Admin window frame
+        self.admin = ttk.Frame(root, style='admin.TFrame')
 
         # Render main frames
-        for frame in (self.mainframe, self.dashboard):
+        for frame in (self.mainframe, self.dashboard, self.admin):
             frame.grid(column=0, row=0, sticky=(N,S,E,W))
             frame.columnconfigure(0, weight=1)
             frame.rowconfigure(0, weight=1)
@@ -58,19 +60,19 @@ class EmployeeManagement:
             child.grid_configure(padx=15, pady=15)
         self.name_entry.focus()
 
-        # Dashboard frame contents
+        # Dashboard frame contents (part for dashboard window from line 63 to 82)
         db_content_frame = ttk.Frame(self.dashboard, padding=50, borderwidth=2, relief='sunken')
         db_content_frame.grid(column=0, row=0)
         db_content_frame.columnconfigure(0, weight=1)
         db_content_frame.rowconfigure(0, weight=1)
 
-        admin_btn = ttk.Button(db_content_frame, text='Admin', style='admin.TButton')
+        admin_btn = ttk.Button(db_content_frame, text='Admin', style='admin.TButton', command=self.raiseAdminWin)
         admin_btn.grid(column=0, row=0, ipadx=25, ipady=50)
 
-        employee_frame = ttk.Button(db_content_frame, text='Employee', style='employee.TButton')
-        employee_frame.grid(column=1, row=0, ipadx=25, ipady=50)
+        employee_btn = ttk.Button(db_content_frame, text='Employee', style='employee.TButton')
+        employee_btn.grid(column=1, row=0, ipadx=25, ipady=50)
 
-        back_btn = ttk.Button(db_content_frame, text='Go back', command=self.goBack)
+        back_btn = ttk.Button(db_content_frame, text='Go back', command=lambda: self.goBack(self.mainframe))
         back_btn.grid(column=0, row=2, columnspan=2, sticky=(E,W))
         
         # Final touches
@@ -78,6 +80,39 @@ class EmployeeManagement:
             child.grid_configure(padx=15, pady=15)
 
         self.showFrame(self.mainframe)
+
+        # Admin window contents
+        admin_content_frame = ttk.Frame(self.admin, padding=30, borderwidth=2, relief='sunken')
+        admin_content_frame.grid(column=0, row=0)
+        admin_content_frame.columnconfigure(0, weight=1)
+        admin_content_frame.rowconfigure(0, weight=1)
+
+        # Employee menu frame
+        employee_menu_fr = ttk.Frame(admin_content_frame, borderwidth=2, relief='sunken')
+        employee_menu_fr.grid(column=0, row=0)
+        ttk.Label(employee_menu_fr, text='Employee Menu').grid(column=0, row=0)
+        ttk.Button(employee_menu_fr, text='1. View employees data').grid(column=0, row=1)
+        ttk.Button(employee_menu_fr, text='2. Add a new employee').grid(column=0, row=2)
+        ttk.Button(employee_menu_fr, text='3. Delete an employee').grid(column=0, row=3)
+        ttk.Button(employee_menu_fr, text='4. Update data of an employee').grid(column=0, row=4)
+        # Attendence menu frame
+        attendence_menu_fr = ttk.Frame(admin_content_frame, borderwidth=2, relief='sunken')
+        attendence_menu_fr.grid(column=1, row=0, sticky=(N,S))
+        ttk.Label(attendence_menu_fr, text='Attendence Menu').grid(column=0, row=0)
+        ttk.Button(attendence_menu_fr, text='1. View Attendence').grid(column=0, row=1)
+        ttk.Button(attendence_menu_fr, text='2. Mark absent/present').grid(column=0, row=2)
+
+        # Go back button
+        back_btn = ttk.Button(admin_content_frame, text='Go back', command=lambda: self.goBack(self.dashboard))
+        back_btn.grid(column=0, row=1, columnspan=2, sticky=(E,W))
+
+        # Final touches
+        for child in admin_content_frame.winfo_children():
+            child.grid_configure(padx=15, pady=15)
+        for child in employee_menu_fr.winfo_children():
+            child.grid_configure(padx=6, pady=6)
+        for child in attendence_menu_fr.winfo_children():
+            child.grid_configure(padx=6, pady=6)
 
     def logIn(self):
         try:
@@ -101,9 +136,11 @@ class EmployeeManagement:
         frame.tkraise()
 
     
-    def goBack(self):
-        self.showFrame(self.mainframe)
+    def goBack(self, frame):
+        self.showFrame(frame)
 
+    def raiseAdminWin(self):
+        self.showFrame(self.admin)
 
 
 root = Tk()
