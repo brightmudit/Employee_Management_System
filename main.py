@@ -2,7 +2,9 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter import font
+from mysql import connector
 import mysql.connector
+from mysql.connector import connection_cext
 
 class EmployeeManagement:
 
@@ -11,13 +13,28 @@ class EmployeeManagement:
         root.columnconfigure(0, weight=1)
         root.rowconfigure(0, weight=1)
 
+        self.mysql_name = 'root'
+        self.mysql_password = 'noob'
+        self.employees_data = []
+        # Connection mysql
+        self.connection = mysql.connector.connect(
+                    host="localhost",
+                    user=self.mysql_name,
+                    passwd=self.mysql_password,
+                    database="employee_database"
+                    )
+        self.cursor = self.connection.cursor()
+
         # Style object
         s = ttk.Style()
         s.configure('mainframe.TFrame', background='red')
         s.configure('dashboard.TFrame', background='blue')
+        s.configure('label.TLabel', font=('Times New Roman', 30))
         s.configure('admin.TFrame', background='green')
-        s.configure('admin.TButton', font=('Times New Roman', 15))
-        s.configure('employee.TButton', font=('Times New Roman', 15))
+        s.configure('employee_data.TFrame', background='yellow')
+        s.configure('ademp.TButton', font=('Times New Roman', 30))
+        s.configure('back.TButton', font=('Times New Roman', 15))
+        s.configure('list.TButton', font=('Times New Roman', 15))
 
         # Creating main frame
         self.mainframe = ttk.Frame(root, style='mainframe.TFrame')
@@ -25,9 +42,11 @@ class EmployeeManagement:
         self.dashboard = ttk.Frame(root, style='dashboard.TFrame')
         # Admin window frame
         self.admin = ttk.Frame(root, style='admin.TFrame')
+        # View employee data frame
+        self.employees_data_fr = ttk.Frame(root, style='employee_data.TFrame')
 
         # Render main frames
-        for frame in (self.mainframe, self.dashboard, self.admin):
+        for frame in (self.mainframe, self.dashboard, self.admin, self.employees_data_fr):
             frame.grid(column=0, row=0, sticky=(N,S,E,W))
             frame.columnconfigure(0, weight=1)
             frame.rowconfigure(0, weight=1)
@@ -53,7 +72,7 @@ class EmployeeManagement:
         self.password_entry.configure(show="*")
 
         # Log in button
-        ttk.Button(content_frame, text="Log in", command=self.logIn).grid(column=2, row=3, sticky=(E, W))
+        ttk.Button(content_frame, text="Log in", command=self.logIn, style='back.TButton').grid(column=2, row=3, sticky=(E, W))
 
         # Final touches
         for child in content_frame.winfo_children():
@@ -66,13 +85,13 @@ class EmployeeManagement:
         db_content_frame.columnconfigure(0, weight=1)
         db_content_frame.rowconfigure(0, weight=1)
 
-        admin_btn = ttk.Button(db_content_frame, text='Admin', style='admin.TButton', command=self.raiseAdminWin)
+        admin_btn = ttk.Button(db_content_frame, text='Admin', style='ademp.TButton', command=self.raiseAdminWin)
         admin_btn.grid(column=0, row=0, ipadx=25, ipady=50)
 
-        employee_btn = ttk.Button(db_content_frame, text='Employee', style='employee.TButton')
+        employee_btn = ttk.Button(db_content_frame, text='Employee', style='ademp.TButton')
         employee_btn.grid(column=1, row=0, ipadx=25, ipady=50)
 
-        back_btn = ttk.Button(db_content_frame, text='Go back', command=lambda: self.goBack(self.mainframe))
+        back_btn = ttk.Button(db_content_frame, text='Go back', command=lambda: self.goBack(self.mainframe), style = 'back.TButton')
         back_btn.grid(column=0, row=2, columnspan=2, sticky=(E,W))
         
         # Final touches
@@ -81,7 +100,7 @@ class EmployeeManagement:
 
         self.showFrame(self.mainframe)
 
-        # Admin window contents
+        # Admin window contents (part of admin window from line 85 to 118)
         admin_content_frame = ttk.Frame(self.admin, padding=30, borderwidth=2, relief='sunken')
         admin_content_frame.grid(column=0, row=0)
         admin_content_frame.columnconfigure(0, weight=1)
@@ -90,44 +109,63 @@ class EmployeeManagement:
         # Employee menu frame
         employee_menu_fr = ttk.Frame(admin_content_frame, borderwidth=2, relief='sunken')
         employee_menu_fr.grid(column=0, row=0)
-        ttk.Label(employee_menu_fr, text='Employee Menu').grid(column=0, row=0)
-        ttk.Button(employee_menu_fr, text='1. View employees data').grid(column=0, row=1)
-        ttk.Button(employee_menu_fr, text='2. Add a new employee').grid(column=0, row=2)
-        ttk.Button(employee_menu_fr, text='3. Delete an employee').grid(column=0, row=3)
-        ttk.Button(employee_menu_fr, text='4. Update data of an employee').grid(column=0, row=4)
+        ttk.Label(employee_menu_fr, text='Employee Menu', style='label.TLabel').grid(column=0, row=0)
+        ttk.Button(employee_menu_fr, text='1. View employees data', style='list.TButton', command=self.raiseViewEmployeeWin).grid(column=0, row=1)
+        ttk.Button(employee_menu_fr, text='2. Add a new employee', style='list.TButton').grid(column=0, row=2)
+        ttk.Button(employee_menu_fr, text='3. Delete an employee', style='list.TButton').grid(column=0, row=3)
+        ttk.Button(employee_menu_fr, text='4. Update data of an employee', style='list.TButton').grid(column=0, row=4)
         # Attendence menu frame
         attendence_menu_fr = ttk.Frame(admin_content_frame, borderwidth=2, relief='sunken')
         attendence_menu_fr.grid(column=1, row=0, sticky=(N,S))
-        ttk.Label(attendence_menu_fr, text='Attendence Menu').grid(column=0, row=0)
-        ttk.Button(attendence_menu_fr, text='1. View Attendence').grid(column=0, row=1)
-        ttk.Button(attendence_menu_fr, text='2. Mark absent/present').grid(column=0, row=2)
+        ttk.Label(attendence_menu_fr, text='Attendence Menu', style='label.TLabel').grid(column=0, row=0)
+        ttk.Button(attendence_menu_fr, text='1. View Attendence', style='list.TButton').grid(column=0, row=1)
+        ttk.Button(attendence_menu_fr, text='2. Mark absent/present', style='list.TButton').grid(column=0, row=2)
 
         # Go back button
-        back_btn = ttk.Button(admin_content_frame, text='Go back', command=lambda: self.goBack(self.dashboard))
+        back_btn = ttk.Button(admin_content_frame, text='Go back', command=lambda: self.goBack(self.dashboard), style='back.TButton')
         back_btn.grid(column=0, row=1, columnspan=2, sticky=(E,W))
 
         # Final touches
         for child in admin_content_frame.winfo_children():
-            child.grid_configure(padx=15, pady=15)
+            child.grid_configure(padx=20, pady=20)
         for child in employee_menu_fr.winfo_children():
-            child.grid_configure(padx=6, pady=6)
+            child.grid_configure(padx=6, pady=12)
         for child in attendence_menu_fr.winfo_children():
-            child.grid_configure(padx=6, pady=6)
+            child.grid_configure(padx=6, pady=12)
 
+        # View employess data window contents
+        data_content_fr = ttk.Frame(self.employees_data_fr, padding=30, borderwidth=2, relief='sunken')
+        data_content_fr.grid(column=0, row=0)
+        data_content_fr.columnconfigure(0, weight=1)
+        data_content_fr.rowconfigure(0, weight=1)
+
+        # Fething employess data
+        self.cursor.execute('SELECT * FROM employee')
+        self.employees_data = self.cursor.fetchall()
+        # Adding column heading
+        ttk.Label(data_content_fr, width=20, text='EId', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=0)
+        ttk.Label(data_content_fr, width=20, text='Name', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=1)
+        ttk.Label(data_content_fr, width=20, text='Gender', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=2)
+        ttk.Label(data_content_fr, width=20, text='Age', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=3)
+        ttk.Label(data_content_fr, width=20, text='Salary', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=4)
+        ttk.Label(data_content_fr, width=20, text='Bonus', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=5)
+        ttk.Label(data_content_fr, width=20, text='Department', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=6)
+        i = 1
+        for employee in self.employees_data:
+            for j in range(len(employee)):
+                e = ttk.Label(data_content_fr, width=20, text=employee[j])
+                e.grid(row=i, column=j)
+            i += 1
+        
     def logIn(self):
-        try:
-            name_value = str(self.name.get())
-            password_value = str(self.password.get())
-
-            conn = mysql.connector.connect(host='localhost', user=name_value, passwd=password_value, database='employee_database')
-
-            if conn.is_connected():
-                print('Connected to MySQL database')
-                self.name_entry.delete(0, END)
-                self.password_entry.delete(0, END)
-                self.showFrame(self.dashboard)
-
-        except Exception as e:
+        name= str(self.name.get())
+        password = str(self.password.get())
+        if name == self.mysql_name and password == self.mysql_password:
+            print('Connected to MySQL database')
+            self.name_entry.delete(0, END)
+            self.password_entry.delete(0, END)
+            self.showFrame(self.dashboard)
+        else:
             messagebox.showerror('Log in fail', 'Incorrect Name or Password. Please check again')
             self.name_entry.delete(0, END)
             self.password_entry.delete(0, END)
@@ -141,6 +179,9 @@ class EmployeeManagement:
 
     def raiseAdminWin(self):
         self.showFrame(self.admin)
+
+    def raiseViewEmployeeWin(self):
+        self.showFrame(self.employees_data_fr)
 
 
 root = Tk()
