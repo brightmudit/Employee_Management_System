@@ -1,3 +1,4 @@
+from logging import exception
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
@@ -32,6 +33,7 @@ class EmployeeManagement:
         s.configure('label.TLabel', font=('Times New Roman', 30))
         s.configure('admin.TFrame', background='green')
         s.configure('employee_data.TFrame', background='yellow')
+        s.configure('addemp_fr.TFrame', background='pink')
         s.configure('ademp.TButton', font=('Times New Roman', 30))
         s.configure('back.TButton', font=('Times New Roman', 15))
         s.configure('list.TButton', font=('Times New Roman', 15))
@@ -44,9 +46,11 @@ class EmployeeManagement:
         self.admin = ttk.Frame(root, style='admin.TFrame')
         # View employee data frame
         self.employees_data_fr = ttk.Frame(root, style='employee_data.TFrame')
+        # Add an employee main frame
+        self.addemp_main_fr = ttk.Frame(root, style='addemp_fr.TFrame')
 
         # Render main frames
-        for frame in (self.mainframe, self.dashboard, self.admin, self.employees_data_fr):
+        for frame in (self.mainframe, self.dashboard, self.admin, self.employees_data_fr, self.addemp_main_fr):
             frame.grid(column=0, row=0, sticky=(N,S,E,W))
             frame.columnconfigure(0, weight=1)
             frame.rowconfigure(0, weight=1)
@@ -111,7 +115,7 @@ class EmployeeManagement:
         employee_menu_fr.grid(column=0, row=0)
         ttk.Label(employee_menu_fr, text='Employee Menu', style='label.TLabel').grid(column=0, row=0)
         ttk.Button(employee_menu_fr, text='1. View employees data', style='list.TButton', command=self.raiseViewEmployeeWin).grid(column=0, row=1)
-        ttk.Button(employee_menu_fr, text='2. Add a new employee', style='list.TButton').grid(column=0, row=2)
+        ttk.Button(employee_menu_fr, text='2. Add a new employee', style='list.TButton', command=self.riaseAddempWin).grid(column=0, row=2)
         ttk.Button(employee_menu_fr, text='3. Delete an employee', style='list.TButton').grid(column=0, row=3)
         ttk.Button(employee_menu_fr, text='4. Update data of an employee', style='list.TButton').grid(column=0, row=4)
         # Attendence menu frame
@@ -133,30 +137,74 @@ class EmployeeManagement:
         for child in attendence_menu_fr.winfo_children():
             child.grid_configure(padx=6, pady=12)
 
-        # View employess data window contents
-        data_content_fr = ttk.Frame(self.employees_data_fr, padding=30, borderwidth=2, relief='sunken')
-        data_content_fr.grid(column=0, row=0)
-        data_content_fr.columnconfigure(0, weight=1)
-        data_content_fr.rowconfigure(0, weight=1)
+        # View employess data window contents (from line 136 to 152 )
+        self.data_content_fr = ttk.Frame(self.employees_data_fr, padding=15, borderwidth=2, relief='sunken')
+        self.data_content_fr.grid(column=0, row=0)
+        self.data_content_fr.columnconfigure(0, weight=1)
+        self.data_content_fr.rowconfigure(0, weight=1)
 
-        # Fething employess data
-        self.cursor.execute('SELECT * FROM employee')
-        self.employees_data = self.cursor.fetchall()
         # Adding column heading
-        ttk.Label(data_content_fr, width=20, text='EId', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=0)
-        ttk.Label(data_content_fr, width=20, text='Name', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=1)
-        ttk.Label(data_content_fr, width=20, text='Gender', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=2)
-        ttk.Label(data_content_fr, width=20, text='Age', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=3)
-        ttk.Label(data_content_fr, width=20, text='Salary', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=4)
-        ttk.Label(data_content_fr, width=20, text='Bonus', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=5)
-        ttk.Label(data_content_fr, width=20, text='Department', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=6)
-        i = 1
-        for employee in self.employees_data:
-            for j in range(len(employee)):
-                e = ttk.Label(data_content_fr, width=20, text=employee[j])
-                e.grid(row=i, column=j)
-            i += 1
+        ttk.Label(self.data_content_fr, width=20, text='EId', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=0)
+        ttk.Label(self.data_content_fr, width=20, text='Name', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=1)
+        ttk.Label(self.data_content_fr, width=20, text='Gender', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=2)
+        ttk.Label(self.data_content_fr, width=20, text='Age', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=3)
+        ttk.Label(self.data_content_fr, width=20, text='Salary', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=4)
+        ttk.Label(self.data_content_fr, width=20, text='Bonus', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=5)
+        ttk.Label(self.data_content_fr, width=20, text='Department', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=6)
         
+        # Go back button
+        ttk.Button(self.employees_data_fr, text='Go back', command=lambda: self.goBack(self.admin), style='back.TButton').grid(row=1, column=0, sticky=(E,W), pady=15)
+
+        # Add an employee window
+        addemp_sub_fr = ttk.Frame(self.addemp_main_fr, padding=15, borderwidth=2, relief='sunken')
+        addemp_sub_fr.grid(column=0, row=0)
+        addemp_sub_fr.columnconfigure(0, weight=1)
+        addemp_sub_fr.rowconfigure(0, weight=1)
+
+        # Adding column heading
+        ttk.Label(addemp_sub_fr, width=20, text='EId', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=0)
+        ttk.Label(addemp_sub_fr, width=20, text='Name', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=1)
+        ttk.Label(addemp_sub_fr, width=20, text='Gender', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=2)
+        ttk.Label(addemp_sub_fr, width=20, text='Age', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=3)
+        ttk.Label(addemp_sub_fr, width=20, text='Salary', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=4)
+        ttk.Label(addemp_sub_fr, width=20, text='Bonus', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=5)
+        ttk.Label(addemp_sub_fr, width=20, text='Department', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=6)
+        
+        # Adding entry label for taking input from user
+        # Eid entry label
+        self.eid = IntVar()
+        self.eid_entry = ttk.Entry(addemp_sub_fr, width=20, textvariable=self.eid)
+        self.eid_entry.grid(column=0, row=1)
+        # Name entry label
+        self.emp_name = StringVar()
+        self.emp_entry = ttk.Entry(addemp_sub_fr, width=20, textvariable=self.emp_name)
+        self.emp_entry.grid(column=1, row=1)
+        # Gender entry label
+        self.gender = StringVar()
+        self.gender_entry = ttk.Entry(addemp_sub_fr, width=20, textvariable=self.gender)
+        self.gender_entry.grid(column=2, row=1)
+        # Age entry label
+        self.age = IntVar()
+        self.age_entry = ttk.Entry(addemp_sub_fr, width=20, textvariable=self.age)
+        self.age_entry.grid(column=3, row=1)
+        # Salary entry label
+        self.salary = IntVar()
+        self.salary_entry = ttk.Entry(addemp_sub_fr, width=20, textvariable=self.salary)
+        self.salary_entry.grid(column=4, row=1)
+        # Bonus entry label
+        self.bonus = IntVar()
+        self.bonus_entry = ttk.Entry(addemp_sub_fr, width=20, textvariable=self.bonus)
+        self.bonus_entry.grid(column=5, row=1)
+        # Department entry label
+        self.depatment = StringVar()
+        self.depatment_entry = ttk.Entry(addemp_sub_fr, width=20, textvariable=self.depatment)
+        self.depatment_entry.grid(column=6, row=1)
+
+        # Save button
+        ttk.Button(addemp_sub_fr, text='Save', command=self.addNewEmp, style='back.TButton').grid(row=2, column=0, columnspan=3, sticky=(E,W))
+        # Go back button
+        ttk.Button(addemp_sub_fr, text='Go back', command=lambda: self.goBack(self.admin), style='back.TButton').grid(row=2, column=4, columnspan=3, sticky=(E,W))
+
     def logIn(self):
         name= str(self.name.get())
         password = str(self.password.get())
@@ -181,8 +229,46 @@ class EmployeeManagement:
         self.showFrame(self.admin)
 
     def raiseViewEmployeeWin(self):
+        self.createDataLayout(self.data_content_fr)
+
         self.showFrame(self.employees_data_fr)
 
+    def createDataLayout(self, parent_frame):
+        # Fething employess data
+        self.cursor.execute('SELECT * FROM employee')
+        self.employees_data = self.cursor.fetchall()
+
+        i = 1
+        for employee in self.employees_data:
+            for j in range(len(employee)):
+                e = ttk.Label(parent_frame, width=20, text=employee[j])
+                e.grid(row=i, column=j)
+            i += 1
+
+    def riaseAddempWin(self):
+        self.showFrame(self.addemp_main_fr)
+
+    def addNewEmp(self):
+        new_employee_data = [self.eid, self.emp_name, self.gender, self.age, self.salary, self.bonus, self.depatment]
+
+        try:
+            insert_sql = "INSERT INTO employee VALUES (%s, %s, %s, %s, %s, %s, %s)"
+            values = []
+            for data in new_employee_data:
+                values.append(data.get())
+            self.cursor.execute(insert_sql, values)
+            self.connection.commit()
+            messagebox.showinfo('Operation Successful', 'New Employee has been successfully added')
+        except exception as e:
+            print(e)
+
+        for entry in [self.eid_entry, self.emp_entry, self.gender_entry, self.age_entry, self.salary_entry, self.bonus_entry, self.depatment_entry]:
+            entry.delete(0, END)
+
+
+
+
+        
 
 root = Tk()
 app = EmployeeManagement(root)
