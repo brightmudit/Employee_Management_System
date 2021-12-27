@@ -34,6 +34,7 @@ class EmployeeManagement:
         s.configure('admin.TFrame', background='green')
         s.configure('employee_data.TFrame', background='yellow')
         s.configure('addemp_fr.TFrame', background='pink')
+        s.configure('delemp_fr.TFrame', background='orange')
         s.configure('ademp.TButton', font=('Times New Roman', 30))
         s.configure('back.TButton', font=('Times New Roman', 15))
         s.configure('list.TButton', font=('Times New Roman', 15))
@@ -48,9 +49,11 @@ class EmployeeManagement:
         self.employees_data_fr = ttk.Frame(root, style='employee_data.TFrame')
         # Add an employee main frame
         self.addemp_main_fr = ttk.Frame(root, style='addemp_fr.TFrame')
+        # Delete an employee main frame
+        self.delemp_main_fr = ttk.Frame(root, style='delemp_fr.TFrame')
 
         # Render main frames
-        for frame in (self.mainframe, self.dashboard, self.admin, self.employees_data_fr, self.addemp_main_fr):
+        for frame in (self.mainframe, self.dashboard, self.admin, self.employees_data_fr, self.addemp_main_fr, self.delemp_main_fr):
             frame.grid(column=0, row=0, sticky=(N,S,E,W))
             frame.columnconfigure(0, weight=1)
             frame.rowconfigure(0, weight=1)
@@ -116,7 +119,7 @@ class EmployeeManagement:
         ttk.Label(employee_menu_fr, text='Employee Menu', style='label.TLabel').grid(column=0, row=0)
         ttk.Button(employee_menu_fr, text='1. View employees data', style='list.TButton', command=self.raiseViewEmployeeWin).grid(column=0, row=1)
         ttk.Button(employee_menu_fr, text='2. Add a new employee', style='list.TButton', command=self.riaseAddempWin).grid(column=0, row=2)
-        ttk.Button(employee_menu_fr, text='3. Delete an employee', style='list.TButton').grid(column=0, row=3)
+        ttk.Button(employee_menu_fr, text='3. Delete an employee', style='list.TButton', command=self.raiseDeleteEmpWin).grid(column=0, row=3)
         ttk.Button(employee_menu_fr, text='4. Update data of an employee', style='list.TButton').grid(column=0, row=4)
         # Attendence menu frame
         attendence_menu_fr = ttk.Frame(admin_content_frame, borderwidth=2, relief='sunken')
@@ -143,19 +146,10 @@ class EmployeeManagement:
         self.data_content_fr.columnconfigure(0, weight=1)
         self.data_content_fr.rowconfigure(0, weight=1)
 
-        # Adding column heading
-        ttk.Label(self.data_content_fr, width=20, text='EId', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=0)
-        ttk.Label(self.data_content_fr, width=20, text='Name', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=1)
-        ttk.Label(self.data_content_fr, width=20, text='Gender', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=2)
-        ttk.Label(self.data_content_fr, width=20, text='Age', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=3)
-        ttk.Label(self.data_content_fr, width=20, text='Salary', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=4)
-        ttk.Label(self.data_content_fr, width=20, text='Bonus', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=5)
-        ttk.Label(self.data_content_fr, width=20, text='Department', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=6)
-        
         # Go back button
-        ttk.Button(self.employees_data_fr, text='Go back', command=lambda: self.goBack(self.admin), style='back.TButton').grid(row=1, column=0, sticky=(E,W), pady=15)
+        ttk.Button(self.employees_data_fr, text='Go back', command=lambda: self.destroyLayoutGoBack(self.admin, self.data_content_fr), style='back.TButton').grid(row=1, column=0, sticky=(E,W), pady=15)
 
-        # Add an employee window
+        # Add an employee subframe window
         addemp_sub_fr = ttk.Frame(self.addemp_main_fr, padding=15, borderwidth=2, relief='sunken')
         addemp_sub_fr.grid(column=0, row=0)
         addemp_sub_fr.columnconfigure(0, weight=1)
@@ -205,6 +199,23 @@ class EmployeeManagement:
         # Go back button
         ttk.Button(addemp_sub_fr, text='Go back', command=lambda: self.goBack(self.admin), style='back.TButton').grid(row=2, column=4, columnspan=3, sticky=(E,W))
 
+        # Delete an employee sub frame window
+        delemp_sub_fr = ttk.Frame(self.delemp_main_fr, padding=15, borderwidth=2, relief='sunken')
+        delemp_sub_fr.grid(column=0, row=0)
+        delemp_sub_fr.columnconfigure(0, weight=1)
+        delemp_sub_fr.rowconfigure(0, weight=1)
+
+        # Eid label text    
+        ttk.Label(delemp_sub_fr, text="EId", font=('Times New Roman', 30)).grid(column=0, row=0)
+        # Eid entry label
+        self.user_given_eid = IntVar()
+        self.user_given_eid_entry = ttk.Entry(delemp_sub_fr, width=20, textvariable=self.user_given_eid, font=('Times New Roman', 15))
+        self.user_given_eid_entry.grid(row=0, column=1, sticky=(E,W))
+        # Save button
+        ttk.Button(delemp_sub_fr, text='Confirm', command=self.deleteEmp, style='back.TButton').grid(row=1, column=0, sticky=(E,W))
+        # Go back button
+        ttk.Button(delemp_sub_fr, text='Go back', command=lambda: self.goBack(self.admin), style='back.TButton').grid(row=1, column=1, sticky=(E,W))
+
     def logIn(self):
         name= str(self.name.get())
         password = str(self.password.get())
@@ -237,6 +248,16 @@ class EmployeeManagement:
         # Fething employess data
         self.cursor.execute('SELECT * FROM employee')
         self.employees_data = self.cursor.fetchall()
+        print(self.employees_data)
+
+        # Adding column heading
+        ttk.Label(parent_frame, width=20, text='EId', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=0)
+        ttk.Label(parent_frame, width=20, text='Name', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=1)
+        ttk.Label(parent_frame, width=20, text='Gender', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=2)
+        ttk.Label(parent_frame, width=20, text='Age', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=3)
+        ttk.Label(parent_frame, width=20, text='Salary', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=4)
+        ttk.Label(parent_frame, width=20, text='Bonus', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=5)
+        ttk.Label(parent_frame, width=20, text='Department', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=6)
 
         i = 1
         for employee in self.employees_data:
@@ -245,6 +266,12 @@ class EmployeeManagement:
                 e.grid(row=i, column=j)
             i += 1
 
+    def destroyLayoutGoBack(self, previos_frame, current_frame):
+        for widget in current_frame.winfo_children():
+            widget.destroy()
+
+        self.showFrame(previos_frame)
+                
     def riaseAddempWin(self):
         self.showFrame(self.addemp_main_fr)
 
@@ -265,8 +292,24 @@ class EmployeeManagement:
         for entry in [self.eid_entry, self.emp_entry, self.gender_entry, self.age_entry, self.salary_entry, self.bonus_entry, self.depatment_entry]:
             entry.delete(0, END)
 
+    def raiseDeleteEmpWin(self):
+        self.showFrame(self.delemp_main_fr)
+
+    def deleteEmp(self):
+        eid = self.user_given_eid.get()
+        print(eid, type(eid))
+        try:
+            delete_sql  = f"DELETE FROM employee WHERE eid = {eid}"
+            self.cursor.execute(delete_sql)     
+            self.connection.commit()
+            messagebox.showinfo('Operation Successful', 'Employee has been successfully deleted')
+
+        except Exception as e:
+            print(e)
+            messagebox.showerror('Operation Failed', 'Please check EId again.')
 
 
+        self.user_given_eid_entry.delete(0, END)
 
         
 
