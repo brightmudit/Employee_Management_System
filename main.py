@@ -31,10 +31,12 @@ class EmployeeManagement:
         s.configure('mainframe.TFrame', background='red')
         s.configure('dashboard.TFrame', background='blue')
         s.configure('label.TLabel', font=('Times New Roman', 30))
+        s.configure('myLabel.TLabel', font = ('Times New Roman', 20))
         s.configure('admin.TFrame', background='green')
         s.configure('employee_data.TFrame', background='yellow')
         s.configure('addemp_fr.TFrame', background='pink')
         s.configure('delemp_fr.TFrame', background='orange')
+        s.configure('upateemp_fr.TFrame', background='lightblue')
         s.configure('ademp.TButton', font=('Times New Roman', 30))
         s.configure('back.TButton', font=('Times New Roman', 15))
         s.configure('list.TButton', font=('Times New Roman', 15))
@@ -51,9 +53,11 @@ class EmployeeManagement:
         self.addemp_main_fr = ttk.Frame(root, style='addemp_fr.TFrame')
         # Delete an employee main frame
         self.delemp_main_fr = ttk.Frame(root, style='delemp_fr.TFrame')
+        # Update employee data main frame
+        self.updateemp_main_fr = ttk.Frame(root, style='upateemp_fr.TFrame')
 
         # Render main frames
-        for frame in (self.mainframe, self.dashboard, self.admin, self.employees_data_fr, self.addemp_main_fr, self.delemp_main_fr):
+        for frame in (self.mainframe, self.dashboard, self.admin, self.employees_data_fr, self.addemp_main_fr, self.delemp_main_fr, self.updateemp_main_fr):
             frame.grid(column=0, row=0, sticky=(N,S,E,W))
             frame.columnconfigure(0, weight=1)
             frame.rowconfigure(0, weight=1)
@@ -120,7 +124,7 @@ class EmployeeManagement:
         ttk.Button(employee_menu_fr, text='1. View employees data', style='list.TButton', command=self.raiseViewEmployeeWin).grid(column=0, row=1)
         ttk.Button(employee_menu_fr, text='2. Add a new employee', style='list.TButton', command=self.riaseAddempWin).grid(column=0, row=2)
         ttk.Button(employee_menu_fr, text='3. Delete an employee', style='list.TButton', command=self.raiseDeleteEmpWin).grid(column=0, row=3)
-        ttk.Button(employee_menu_fr, text='4. Update data of an employee', style='list.TButton').grid(column=0, row=4)
+        ttk.Button(employee_menu_fr, text='4. Update data of an employee', style='list.TButton', command=self.raiseUpdateEmpWin).grid(column=0, row=4)
         # Attendence menu frame
         attendence_menu_fr = ttk.Frame(admin_content_frame, borderwidth=2, relief='sunken')
         attendence_menu_fr.grid(column=1, row=0, sticky=(N,S))
@@ -206,7 +210,7 @@ class EmployeeManagement:
         delemp_sub_fr.rowconfigure(0, weight=1)
 
         # Eid label text    
-        ttk.Label(delemp_sub_fr, text="EId", font=('Times New Roman', 30)).grid(column=0, row=0)
+        ttk.Label(delemp_sub_fr, text="EId", style='myLabel.TLabel').grid(column=0, row=0)
         # Eid entry label
         self.user_given_eid = IntVar()
         self.user_given_eid_entry = ttk.Entry(delemp_sub_fr, width=20, textvariable=self.user_given_eid, font=('Times New Roman', 15))
@@ -216,6 +220,43 @@ class EmployeeManagement:
         # Go back button
         ttk.Button(delemp_sub_fr, text='Go back', command=lambda: self.goBack(self.admin), style='back.TButton').grid(row=1, column=1, sticky=(E,W))
 
+        # Update employee data sub frame widnow
+        self.updateemp_sub_fr = ttk.Frame(self.updateemp_main_fr, padding=15, borderwidth=2, relief='sunken')
+        self.updateemp_sub_fr.grid(column=0, row=0)
+        self.updateemp_sub_fr.columnconfigure(0, weight=1)
+        self.updateemp_sub_fr.rowconfigure(0, weight=1)
+
+        ttk.Label(self.updateemp_sub_fr, text='Select Column', style='myLabel.TLabel').grid(row=0, column=0)
+        select_col_fr = ttk.Frame(self.updateemp_sub_fr)
+        select_col_fr.grid(row=0,column=1)
+        # Inserting 7 column inside above frame
+        ttk.Button(select_col_fr, text='EId', command=lambda: self.createInputFields('eId', IntVar(), IntVar(), 'Employee Eid', 'New Eid'), style='back.TButton').grid(row=0,column=0)
+        ttk.Button(select_col_fr, text='Name', command=lambda: self.createInputFields('eName', IntVar(), StringVar(), 'Employee Eid', 'New Name'), style='back.TButton').grid(row=0,column=1)
+        ttk.Button(select_col_fr, text='Gender', command=lambda: self.createInputFields('eGender', IntVar(), StringVar(), 'Employee Eid', 'New Gender'), style='back.TButton').grid(row=0,column=2)
+        ttk.Button(select_col_fr, text='Age', command=lambda: self.createInputFields('eAge', IntVar(), IntVar(), 'Employee Eid', 'New Age'), style='back.TButton').grid(row=1,column=0)
+        ttk.Button(select_col_fr, text='Salary', command=lambda: self.createInputFields('eSalary', IntVar(), IntVar(), 'Employee Eid', 'New Salary'), style='back.TButton').grid(row=1,column=1)
+        ttk.Button(select_col_fr, text='Bonus', command=lambda: self.createInputFields('eBonus', IntVar(), IntVar(), 'Employee Eid', 'New Bonus'), style='back.TButton').grid(row=1,column=2)
+        ttk.Button(select_col_fr, text='Department', command=lambda: self.createInputFields('eDepartment', IntVar(), StringVar(), 'Employee Eid', 'New Department'), style='back.TButton').grid(row=2,column=1)
+
+        # Data entry frame
+        self.input_fr = ttk.Frame(self.updateemp_sub_fr)
+        self.input_fr.grid(row=1, column=0)
+
+        # Variables
+        self.input_filed_one = None
+        self.input_filed_two = None
+        self.whichColumn = None
+
+        # Save button 
+        ttk.Button(self.updateemp_sub_fr, text='Save', command=self.updateEmpDb, style='back.TButton').grid(row=2, column=0)
+        # Back button
+        ttk.Button(self.updateemp_sub_fr, text='Go Back', command=lambda: self.goBack(self.admin), style='back.TButton').grid(row=2, column=1)
+
+        # Final Touches with padding
+        for child in select_col_fr.winfo_children():
+            child.grid_configure(padx=10, pady=10)
+        for child in self.updateemp_sub_fr.winfo_children():
+            child.grid_configure(padx=20, pady=20)
     def logIn(self):
         name= str(self.name.get())
         password = str(self.password.get())
@@ -234,6 +275,7 @@ class EmployeeManagement:
 
     
     def goBack(self, frame):
+        self.destroyInputFields()
         self.showFrame(frame)
 
     def raiseAdminWin(self):
@@ -286,6 +328,7 @@ class EmployeeManagement:
             self.cursor.execute(insert_sql, values)
             self.connection.commit()
             messagebox.showinfo('Operation Successful', 'New Employee has been successfully added')
+            self.goBack(self.admin)
         except exception as e:
             print(e)
 
@@ -303,7 +346,7 @@ class EmployeeManagement:
             self.cursor.execute(delete_sql)     
             self.connection.commit()
             messagebox.showinfo('Operation Successful', 'Employee has been successfully deleted')
-
+            self.goBack(self.admin)
         except Exception as e:
             print(e)
             messagebox.showerror('Operation Failed', 'Please check EId again.')
@@ -311,6 +354,41 @@ class EmployeeManagement:
 
         self.user_given_eid_entry.delete(0, END)
 
+    def raiseUpdateEmpWin(self):
+        self.showFrame(self.updateemp_main_fr)
+
+    def createInputFields(self, column, field_one_type, filed_two_type, label1, label2):
+        self.destroyInputFields()
+        self.whichColumn = column
+        self.input_filed_one = field_one_type
+        self.input_filed_two = filed_two_type
+        ttk.Label(self.input_fr, text=label1, style='myLabel.TLabel').grid(row=0, column=0)
+        ttk.Entry(self.input_fr, textvariable=self.input_filed_one, width=20).grid(row=0, column=1)
+        ttk.Label(self.input_fr, text=label2, style='myLabel.TLabel').grid(row=1, column=0)
+        ttk.Entry(self.input_fr, textvariable=self.input_filed_two, width=20).grid(row=1, column=1)
+
+        # Final Touches
+        for child in self.input_fr.winfo_children():
+            child.grid_configure(padx=10, pady=10)
+
+    def updateEmpDb(self):
+        try:
+            update_sql = f"UPDATE employee SET {self.whichColumn} = '{self.input_filed_two.get()}' WHERE eId = {self.input_filed_one.get()}"
+            self.cursor.execute(update_sql)
+
+            self.connection.commit()
+            messagebox.showinfo('Operation Successful', 'Employee data has been successfully upated')
+            # Delte those input fields
+            self.destroyInputFields()
+            self.goBack(self.admin)
+            
+        except Exception as e:
+            print(e)
+
+    def destroyInputFields(self):
+        for widget in self.input_fr.winfo_children():
+            widget.destroy()
+        
         
 
 root = Tk()
