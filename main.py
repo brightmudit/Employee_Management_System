@@ -219,7 +219,9 @@ class EmployeeManagement:
         ttk.Button(delemp_sub_fr, text='Confirm', command=self.deleteEmp, style='back.TButton').grid(row=1, column=0, sticky=(E,W))
         # Go back button
         ttk.Button(delemp_sub_fr, text='Go back', command=lambda: self.goBack(self.admin), style='back.TButton').grid(row=1, column=1, sticky=(E,W))
-
+        # Finla touches
+        for child in delemp_sub_fr.winfo_children():
+            child.grid_configure(padx=20, pady=20)
         # Update employee data sub frame widnow
         self.updateemp_sub_fr = ttk.Frame(self.updateemp_main_fr, padding=15, borderwidth=2, relief='sunken')
         self.updateemp_sub_fr.grid(column=0, row=0)
