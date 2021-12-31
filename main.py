@@ -13,18 +13,19 @@ class EmployeeManagement:
         root.title("Employee Management System")
         root.columnconfigure(0, weight=1)
         root.rowconfigure(0, weight=1)
-
-        self.mysql_name = 'root'
-        self.mysql_password = 'noob'
         self.employees_data = []
-        # Connection mysql
-        self.connection = mysql.connector.connect(
-                    host="localhost",
-                    user=self.mysql_name,
-                    passwd=self.mysql_password,
-                    database="employee_database"
-                    )
-        self.cursor = self.connection.cursor()
+
+        # self.mysql_name = 'root'
+        # self.mysql_password = 'noob'
+        # self.employees_data = []
+        # # Connection mysql
+        # self.connection = mysql.connector.connect(
+        #             host="localhost",
+        #             user=self.mysql_name,
+        #             passwd=self.mysql_password,
+        #             database="employee_database"
+        #             )
+        # self.cursor = self.connection.cursor()
 
         # Style object
         s = ttk.Style()
@@ -259,18 +260,44 @@ class EmployeeManagement:
             child.grid_configure(padx=10, pady=10)
         for child in self.updateemp_sub_fr.winfo_children():
             child.grid_configure(padx=20, pady=20)
+        
     def logIn(self):
-        name= str(self.name.get())
-        password = str(self.password.get())
-        if name == self.mysql_name and password == self.mysql_password:
-            print('Connected to MySQL database')
-            self.name_entry.delete(0, END)
-            self.password_entry.delete(0, END)
+        # Try to connecti with local mysql
+        # name= str(self.name.get())
+        # password = str(self.password.get())
+        # if name == self.mysql_name and password == self.mysql_password:
+        #     print('Connected to MySQL database')
+        #     self.name_entry.delete(0, END)
+        #     self.password_entry.delete(0, END)
+        #     self.showFrame(self.dashboard)
+        # else:
+        #     messagebox.showerror('Log in fail', 'Incorrect Name or Password. Please check again')
+        #     self.name_entry.delete(0, END)
+        #     self.password_entry.delete(0, END)
+
+        self.mysql_name = str(self.name.get())
+        self.mysql_password = str(self.password.get())
+       
+        # Connection mysql
+        try:
+            self.connection = mysql.connector.connect(
+                host="localhost",
+                user=self.mysql_name,
+                passwd=self.mysql_password,
+                database="employee_database"
+            )
+
+            print('Connnection Successfull!!')
+            self.cursor = self.connection.cursor()
             self.showFrame(self.dashboard)
-        else:
-            messagebox.showerror('Log in fail', 'Incorrect Name or Password. Please check again')
             self.name_entry.delete(0, END)
             self.password_entry.delete(0, END)
+
+        except Exception as e:
+            print(e)
+            self.name_entry.delete(0, END)
+            self.password_entry.delete(0, END)
+            messagebox.showerror('Log in fail', 'Possible causes :-\n1. Incorrect Name or Password\n2. Database missing\n3. No Inputs')
 
     def showFrame(self, frame):
         frame.tkraise()
@@ -292,7 +319,6 @@ class EmployeeManagement:
         # Fething employess data
         self.cursor.execute('SELECT * FROM employee')
         self.employees_data = self.cursor.fetchall()
-        print(self.employees_data)
 
         # Adding column heading
         ttk.Label(parent_frame, width=20, text='EId', borderwidth=1, relief=RIDGE, background='yellow').grid(row=0, column=0)
