@@ -30,7 +30,6 @@ class EmployeeManagement:
         # Style object
         s = ttk.Style()
         s.configure('mainframe.TFrame', background='red')
-        s.configure('dashboard.TFrame', background='blue')
         s.configure('label.TLabel', font=('Times New Roman', 30))
         s.configure('myLabel.TLabel', font = ('Times New Roman', 20))
         s.configure('admin.TFrame', background='green')
@@ -44,8 +43,6 @@ class EmployeeManagement:
 
         # Creating main frame
         self.mainframe = ttk.Frame(root, style='mainframe.TFrame')
-        # Dasboard frame
-        self.dashboard = ttk.Frame(root, style='dashboard.TFrame')
         # Admin window frame
         self.admin = ttk.Frame(root, style='admin.TFrame')
         # View employee data frame
@@ -58,7 +55,7 @@ class EmployeeManagement:
         self.updateemp_main_fr = ttk.Frame(root, style='upateemp_fr.TFrame')
 
         # Render main frames
-        for frame in (self.mainframe, self.dashboard, self.admin, self.employees_data_fr, self.addemp_main_fr, self.delemp_main_fr, self.updateemp_main_fr):
+        for frame in (self.mainframe, self.admin, self.employees_data_fr, self.addemp_main_fr, self.delemp_main_fr, self.updateemp_main_fr):
             frame.grid(column=0, row=0, sticky=(N,S,E,W))
             frame.columnconfigure(0, weight=1)
             frame.rowconfigure(0, weight=1)
@@ -91,25 +88,7 @@ class EmployeeManagement:
             child.grid_configure(padx=15, pady=15)
         self.name_entry.focus()
 
-        # Dashboard frame contents (part for dashboard window from line 63 to 82)
-        db_content_frame = ttk.Frame(self.dashboard, padding=50, borderwidth=2, relief='sunken')
-        db_content_frame.grid(column=0, row=0)
-        db_content_frame.columnconfigure(0, weight=1)
-        db_content_frame.rowconfigure(0, weight=1)
-
-        admin_btn = ttk.Button(db_content_frame, text='Admin', style='ademp.TButton', command=self.raiseAdminWin)
-        admin_btn.grid(column=0, row=0, ipadx=25, ipady=50)
-
-        employee_btn = ttk.Button(db_content_frame, text='Employee', style='ademp.TButton')
-        employee_btn.grid(column=1, row=0, ipadx=25, ipady=50)
-
-        back_btn = ttk.Button(db_content_frame, text='Go back', command=lambda: self.goBack(self.mainframe), style = 'back.TButton')
-        back_btn.grid(column=0, row=2, columnspan=2, sticky=(E,W))
-        
-        # Final touches
-        for child in db_content_frame.winfo_children():
-            child.grid_configure(padx=15, pady=15)
-
+        # Start the login screen first
         self.showFrame(self.mainframe)
 
         # Admin window contents (part of admin window from line 85 to 118)
@@ -129,12 +108,12 @@ class EmployeeManagement:
         # Attendence menu frame
         attendence_menu_fr = ttk.Frame(admin_content_frame, borderwidth=2, relief='sunken')
         attendence_menu_fr.grid(column=1, row=0, sticky=(N,S))
-        ttk.Label(attendence_menu_fr, text='Attendence Menu', style='label.TLabel').grid(column=0, row=0)
-        ttk.Button(attendence_menu_fr, text='1. View Attendence', style='list.TButton').grid(column=0, row=1)
-        ttk.Button(attendence_menu_fr, text='2. Mark absent/present', style='list.TButton').grid(column=0, row=2)
+        ttk.Label(attendence_menu_fr, text='Graphical view menu', style='label.TLabel').grid(column=0, row=0)
+        ttk.Button(attendence_menu_fr, text='1. Name-Salary graph', style='list.TButton').grid(column=0, row=1)
+        ttk.Button(attendence_menu_fr, text='2. Bonus Graph', style='list.TButton').grid(column=0, row=2)
 
         # Go back button
-        back_btn = ttk.Button(admin_content_frame, text='Go back', command=lambda: self.goBack(self.dashboard), style='back.TButton')
+        back_btn = ttk.Button(admin_content_frame, text='Go back', command=lambda: self.goBack(self.mainframe), style='back.TButton')
         back_btn.grid(column=0, row=1, columnspan=2, sticky=(E,W))
 
         # Final touches
@@ -289,7 +268,7 @@ class EmployeeManagement:
 
             print('Connnection Successfull!!')
             self.cursor = self.connection.cursor()
-            self.showFrame(self.dashboard)
+            self.showFrame(self.admin)
             self.name_entry.delete(0, END)
             self.password_entry.delete(0, END)
 
@@ -417,7 +396,9 @@ class EmployeeManagement:
         for widget in self.input_fr.winfo_children():
             widget.destroy()
         
-        
+    def drawNameSalaryGrpah(self):
+        pass
+
 
 root = Tk()
 app = EmployeeManagement(root)
