@@ -52,30 +52,30 @@ def createEmployeeTable():
 
     sql = "INSERT INTO employee (eId, eName, eGender, eAge, eSalary, eBonus, eDepartment) VALUES (%s, %s, %s, %s, %s, %s, %s)"
     val = [
-        (501, 'Aman Singh', 'Male', 23, 15000, 2000, 'Cusomer Care'),
+        (501, 'Aman Singh', 'Male', 23, 15000, 2000, 'Customer Care'),
         (502,'Rajeev Jain', 'Male', 45, 60000, 0, 'Production'),
-        (503, 'Gautam Motwani',	'Male',	26,	15000, 2000, 'Cusomer Care'),
-        (504, 'Kripesh Agarwa',	'Male', 30, 15000, 2000, 'Cusomer Care'),
+        (503, 'Gautam Motwani',	'Male',	26,	15000, 2000, 'Customer Care'),
+        (504, 'Kripesh Agarwa',	'Male', 30, 15000, 2000, 'Customer Care'),
         (505, 'Shanti Sharma', 'Female', 35, 25000, 3500, 'HR'),
-        (506, 'Neha Rathore', 'Female', 21,	15000, 2000, 'Cusomer Care'),
-        (507, 'Gaurav Jain', 'Male', 25, 15000, 2000, 'Cusomer Care'),
+        (506, 'Neha Rathore', 'Female', 21,	15000, 2000, 'Customer Care'),
+        (507, 'Gaurav Jain', 'Male', 25, 15000, 2000, 'Customer Care'),
         (508, 'Amit Berwa', 'Male',	30, 25000, 3500, 'HR'),
-        (509, 'Ayushi Dass', 'Female', 29, 15000, 2000, 'Cusomer Care'),
+        (509, 'Ayushi Dass', 'Female', 29, 15000, 2000, 'Customer Care'),
         (510, 'Sumit Devnath', 'Male', 38, 35000, 5000, 'Sales'),
-        (511, 'Diya Gupta', 'Female', 22, 15000, 2000, 'Cusomer Care'),
+        (511, 'Diya Gupta', 'Female', 22, 15000, 2000, 'Customer Care'),
         (512, 'Nidhi Jangid', 'Female', 45,	60000, 0, 'Production'),
         (513, 'Krishna Kumawat', 'Female', 35, 35000, 5000, 'Sales'),
-        (514, 'Aryan Khan', 'Male',	27,	15000, 2000, 'Cusomer Care'),
-        (515, 'Riya Shekhawat', 'Female', 22, 15000, 2000, 'Cusomer Care'),
-        (516, 'Narendra Kumar Choudhary', 'Male', 26, 15000, 2000, 'Cusomer Care'),
-        (517, 'Aditya Bajaj', 'Male', 23, 15000, 2000, 'Cusomer Care'),
-        (518, 'Nitin Kumar', 'Male', 28, 15000, 2000, 'Cusomer Care'),
+        (514, 'Aryan Khan', 'Male',	27,	15000, 2000, 'Customer Care'),
+        (515, 'Riya Shekhawat', 'Female', 22, 15000, 2000, 'Customer Care'),
+        (516, 'Narendra Kumar Choudhary', 'Male', 26, 15000, 2000, 'Customer Care'),
+        (517, 'Aditya Bajaj', 'Male', 23, 15000, 2000, 'Customer Care'),
+        (518, 'Nitin Kumar', 'Male', 28, 15000, 2000, 'Customer Care'),
         (519, 'Naman Mathur', 'Male', 30, 35000, 5000, 'Sales'),
         (520, 'Tanmay Singh', 'Male', 35, 35000, 5000, 'Sales'),
         (521, 'Mukul Roy', 'Male', 39, 35000, 5000, 'Sales'),
-        (522, 'Mishti Gupta', 'Female',	21, 15000, 2000, 'Cusomer Care'),
+        (522, 'Mishti Gupta', 'Female',	21, 15000, 2000, 'Customer Care'),
         (523, 'Yashika Gurjar', 'Female', 30, 25000, 3500, 'HR'),
-        (524, 'Hari Singh Sehkhawat', 'Male', 22, 15000, 2000, 'Cusomer Care')
+        (524, 'Hari Singh Sehkhawat', 'Male', 22, 15000, 2000, 'Customer Care')
     ]
 
     cursor.executemany(sql, val)
