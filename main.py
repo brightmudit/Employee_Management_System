@@ -1,11 +1,15 @@
+from distutils import command
 from logging import exception
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter import font
+from turtle import width
 from mysql import connector
 import mysql.connector
 from mysql.connector import connection_cext
+import pandas as pd
+import matplotlib.pyplot as plt
 
 class EmployeeManagement:
 
@@ -105,12 +109,14 @@ class EmployeeManagement:
         ttk.Button(employee_menu_fr, text='2. Add a new employee', style='list.TButton', command=self.riaseAddempWin).grid(column=0, row=2)
         ttk.Button(employee_menu_fr, text='3. Delete an employee', style='list.TButton', command=self.raiseDeleteEmpWin).grid(column=0, row=3)
         ttk.Button(employee_menu_fr, text='4. Update data of an employee', style='list.TButton', command=self.raiseUpdateEmpWin).grid(column=0, row=4)
-        # Attendence menu frame
-        attendence_menu_fr = ttk.Frame(admin_content_frame, borderwidth=2, relief='sunken')
-        attendence_menu_fr.grid(column=1, row=0, sticky=(N,S))
-        ttk.Label(attendence_menu_fr, text='Graphical view menu', style='label.TLabel').grid(column=0, row=0)
-        ttk.Button(attendence_menu_fr, text='1. Name-Salary graph', style='list.TButton').grid(column=0, row=1)
-        ttk.Button(attendence_menu_fr, text='2. Bonus Graph', style='list.TButton').grid(column=0, row=2)
+        # Graph menu frame
+        graph_menu_fr = ttk.Frame(admin_content_frame, borderwidth=2, relief='sunken')
+        graph_menu_fr.grid(column=1, row=0, sticky=(N,S))
+        ttk.Label(graph_menu_fr, text='Graphical view menu', style='label.TLabel').grid(column=0, row=0)
+        ttk.Button(graph_menu_fr, text='1. Total Salary Grpah', style='list.TButton', command=self.drawTotalSalaryGraph).grid(column=0, row=1)
+        ttk.Button(graph_menu_fr, text='2. Total Bonus Graph', style='list.TButton').grid(column=0, row=2)
+        ttk.Button(graph_menu_fr, text='3. Average Salary Graph', style='list.TButton').grid(column=0, row=3)
+        ttk.Button(graph_menu_fr, text='4. Average Bonus Graph', style='list.TButton').grid(column=0, row=4)
 
         # Go back button
         back_btn = ttk.Button(admin_content_frame, text='Go back', command=lambda: self.goBack(self.mainframe), style='back.TButton')
@@ -121,7 +127,7 @@ class EmployeeManagement:
             child.grid_configure(padx=20, pady=20)
         for child in employee_menu_fr.winfo_children():
             child.grid_configure(padx=6, pady=12)
-        for child in attendence_menu_fr.winfo_children():
+        for child in graph_menu_fr.winfo_children():
             child.grid_configure(padx=6, pady=12)
 
         # View employess data window contents (from line 136 to 152 )
@@ -396,12 +402,23 @@ class EmployeeManagement:
         for widget in self.input_fr.winfo_children():
             widget.destroy()
         
-    def drawNameSalaryGrpah(self):
-        pass
+    def drawTotalSalaryGraph(self):
+        total_salary_by_department = self.fetchTotalSalryDeptFromTable()
+        df = self.createDataFrame(total_salary_by_department, "Total Salary", "Departments")
+        
+        plt.bar(df['Departments'], df['Total Salary'], width = 0.4)
+        plt.xlabel('Departments')
+        plt.ylabel('Total Salary')
+        plt.title('Total Salary given in Differnet Departments')
+        plt.show()
 
+    def fetchTotalSalryDeptFromTable(self):
+         self.cursor.execute('SELECT SUM(eSalary), eDepartment FROM employee GROUP BY eDepartment')
+         return self.cursor.fetchall()
 
+    def createDataFrame(self, data, *column_names):
+        return pd.DataFrame(data, columns=column_names)
 root = Tk()
 app = EmployeeManagement(root)
-
 # Starting mainloop
 root.mainloop()
