@@ -1,5 +1,7 @@
+from cgitb import text
 from distutils import command
 from logging import exception
+from time import sleep
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
@@ -33,6 +35,7 @@ class EmployeeManagement:
 
         # Style object
         s = ttk.Style()
+        s.configure('welcomeFrame.TFrame', background = '#bfbaba')
         s.configure('mainframe.TFrame', background='red')
         s.configure('label.TLabel', font=('Times New Roman', 30))
         s.configure('myLabel.TLabel', font = ('Times New Roman', 20))
@@ -44,7 +47,12 @@ class EmployeeManagement:
         s.configure('ademp.TButton', font=('Times New Roman', 30))
         s.configure('back.TButton', font=('Times New Roman', 15))
         s.configure('list.TButton', font=('Times New Roman', 15))
+        s.configure('h1.TLabel', font = ('Times New Roman', 35, 'bold'))
+        s.configure('h2.TLabel', font = ('Times New Roman', 27, 'bold'))
+        s.configure('h3.TLabel', font = ('Times New Roman', 19, 'bold'))
 
+        # Welcome screen main frame
+        self.welcome_screen_fr = ttk.Frame(root, style='welcomeFrame.TFrame')
         # Creating main frame
         self.mainframe = ttk.Frame(root, style='mainframe.TFrame')
         # Admin window frame
@@ -59,10 +67,32 @@ class EmployeeManagement:
         self.updateemp_main_fr = ttk.Frame(root, style='upateemp_fr.TFrame')
 
         # Render main frames
-        for frame in (self.mainframe, self.admin, self.employees_data_fr, self.addemp_main_fr, self.delemp_main_fr, self.updateemp_main_fr):
+        for frame in (self.welcome_screen_fr, self.mainframe, self.admin, self.employees_data_fr, self.addemp_main_fr, self.delemp_main_fr, self.updateemp_main_fr):
             frame.grid(column=0, row=0, sticky=(N,S,E,W))
             frame.columnconfigure(0, weight=1)
             frame.rowconfigure(0, weight=1)
+
+        # Welcome screen sub frame
+        welcome_sub_fr = ttk.Frame(self.welcome_screen_fr, borderwidth=2, relief='sunken', padding=50)
+        welcome_sub_fr.grid(column=0, row=0)
+        welcome_sub_fr.columnconfigure(0, weight=1)
+        welcome_sub_fr.rowconfigure(0, weight=1)
+
+        ttk.Label(welcome_sub_fr, text='Welcome to', style='h1.TLabel').grid(column=0, row=0)
+        ttk.Label(welcome_sub_fr, text='Employee Management System', style='h1.TLabel').grid(column=0, row=1)
+        ttk.Label(welcome_sub_fr, text='CBSE AISSCE PROJECT', style='h2.TLabel').grid(column=0, row=2)
+        ttk.Label(welcome_sub_fr, text='I.P. (2021-2022)', style='h2.TLabel').grid(column=0, row=3)
+
+        ttk.Label(welcome_sub_fr, text='Developed by : Mudit Choudhary', style='h3.TLabel').grid(column=0, row=4)
+        ttk.Label(welcome_sub_fr, text='Class 12 - C', style='h3.TLabel').grid(column=0, row=5)
+        ttk.Label(welcome_sub_fr, text='Kendriya Vidhalaya No.4', style='h3.TLabel').grid(column=0, row=6)
+
+
+        ttk.Button(welcome_sub_fr, text='Continue', style='back.TButton', command=self.raiseLogInScreen).grid(column=0, row=7)
+        
+        # Final touches
+        for child in welcome_sub_fr.winfo_children():
+            child.grid_configure(padx=80, pady=10)
 
         # Content frame (part of mainframe window from line 31 to 57)
         content_frame = ttk.Frame(self.mainframe, padding=60, borderwidth=2, relief='sunken')
@@ -92,8 +122,8 @@ class EmployeeManagement:
             child.grid_configure(padx=15, pady=15)
         self.name_entry.focus()
 
-        # Start the login screen first
-        self.showFrame(self.mainframe)
+        # Start the welcome screen first
+        self.showFrame(self.welcome_screen_fr)
 
         # Admin window contents (part of admin window from line 85 to 118)
         admin_content_frame = ttk.Frame(self.admin, padding=30, borderwidth=2, relief='sunken')
@@ -245,7 +275,9 @@ class EmployeeManagement:
             child.grid_configure(padx=10, pady=10)
         for child in self.updateemp_sub_fr.winfo_children():
             child.grid_configure(padx=20, pady=20)
-        
+    
+    def raiseLogInScreen(self):
+        self.showFrame(self.mainframe)
     def logIn(self):
         # Try to connecti with local mysql
         # name= str(self.name.get())
