@@ -114,9 +114,9 @@ class EmployeeManagement:
         graph_menu_fr.grid(column=1, row=0, sticky=(N,S))
         ttk.Label(graph_menu_fr, text='Graphical view menu', style='label.TLabel').grid(column=0, row=0)
         ttk.Button(graph_menu_fr, text='1. Total Salary Grpah', style='list.TButton', command=self.drawTotalSalaryGraph).grid(column=0, row=1)
-        ttk.Button(graph_menu_fr, text='2. Total Bonus Graph', style='list.TButton').grid(column=0, row=2)
-        ttk.Button(graph_menu_fr, text='3. Average Salary Graph', style='list.TButton').grid(column=0, row=3)
-        ttk.Button(graph_menu_fr, text='4. Average Bonus Graph', style='list.TButton').grid(column=0, row=4)
+        ttk.Button(graph_menu_fr, text='2. Total Bonus Graph', style='list.TButton', command=self.drawTotalBonusGraph).grid(column=0, row=2)
+        ttk.Button(graph_menu_fr, text='3. Average Salary Graph', style='list.TButton', command=self.drawAvgSalaryGraph).grid(column=0, row=3)
+        ttk.Button(graph_menu_fr, text='4. Average Bonus Graph', style='list.TButton', command=self.drawAvgBonusGraph).grid(column=0, row=4)
 
         # Go back button
         back_btn = ttk.Button(admin_content_frame, text='Go back', command=lambda: self.goBack(self.mainframe), style='back.TButton')
@@ -403,7 +403,7 @@ class EmployeeManagement:
             widget.destroy()
         
     def drawTotalSalaryGraph(self):
-        total_salary_by_department = self.fetchTotalSalryDeptFromTable()
+        total_salary_by_department = self.fetchTotalSalaryDept()
         df = self.createDataFrame(total_salary_by_department, "Total Salary", "Departments")
         
         plt.bar(df['Departments'], df['Total Salary'], width = 0.4)
@@ -411,10 +411,52 @@ class EmployeeManagement:
         plt.ylabel('Total Salary')
         plt.title('Total Salary given in Differnet Departments')
         plt.show()
+    
+    def drawTotalBonusGraph(self):
+        total_bonus_by_department = self.fetchTotalBonusDept()
+        df = self.createDataFrame(total_bonus_by_department, "Total Bonus", "Departments")
 
-    def fetchTotalSalryDeptFromTable(self):
-         self.cursor.execute('SELECT SUM(eSalary), eDepartment FROM employee GROUP BY eDepartment')
-         return self.cursor.fetchall()
+        plt.bar(df['Departments'], df['Total Bonus'], width=0.4)
+        plt.xlabel('Departments')
+        plt.ylabel('Total Bonus')
+        plt.title('Total Bonus given in Differnet Departments')
+        plt.show()
+
+    def drawAvgSalaryGraph(self):
+        avg_salary_by_department = self.fetchAvgSalaryDept()
+        df = self.createDataFrame(avg_salary_by_department, "Average Salary", "Departments")
+
+        plt.bar(df['Departments'], df['Average Salary'], width=0.4)
+        plt.xlabel('Departments')
+        plt.ylabel('Average Salary')
+        plt.title('Average Salary given in Differnet Departments')
+        plt.show()
+
+    def drawAvgBonusGraph(self):
+        avg_bonus_by_department = self.fetchAvgBonusDept()
+        df = self.createDataFrame(avg_bonus_by_department, "Average Bonus", "Departments")
+
+        plt.bar(df['Departments'], df['Average Bonus'], width=0.4)
+        plt.xlabel('Departments')
+        plt.ylabel('Average Bonus')
+        plt.title('Average Bonus given in Differnet Departments')
+        plt.show()
+
+    def fetchTotalSalaryDept(self):
+        self.cursor.execute('SELECT SUM(eSalary), eDepartment FROM employee GROUP BY eDepartment')
+        return self.cursor.fetchall()
+
+    def fetchTotalBonusDept(self):
+        self.cursor.execute('SELECT SUM(eBonus), eDepartment FROM employee GROUP BY eDepartment')   
+        return self.cursor.fetchall()
+
+    def fetchAvgSalaryDept(self):
+        self.cursor.execute('SELECT AVG(eSalary), eDepartment FROM employee GROUP BY eDepartment')   
+        return self.cursor.fetchall()
+    
+    def fetchAvgBonusDept(self):
+        self.cursor.execute('SELECT AVG(eBonus), eDepartment FROM employee GROUP BY eDepartment')   
+        return self.cursor.fetchall()
 
     def createDataFrame(self, data, *column_names):
         return pd.DataFrame(data, columns=column_names)
