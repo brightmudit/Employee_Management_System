@@ -12,6 +12,7 @@ import mysql.connector
 from mysql.connector import connection_cext
 import pandas as pd
 import matplotlib.pyplot as plt
+from sqlalchemy import column
 
 class EmployeeManagement:
 
@@ -116,7 +117,8 @@ class EmployeeManagement:
 
         # Log in button
         ttk.Button(content_frame, text="Log in", command=self.logIn, style='back.TButton').grid(column=2, row=3, sticky=(E, W))
-
+        ttk.Button(content_frame, text="Go back", command=lambda: self.goBack(self.welcome_screen_fr), style='back.TButton').grid(column=2, row=4)
+        
         # Final touches
         for child in content_frame.winfo_children():
             child.grid_configure(padx=15, pady=15)
@@ -161,10 +163,21 @@ class EmployeeManagement:
             child.grid_configure(padx=6, pady=12)
 
         # View employess data window contents (from line 136 to 152 )
-        self.data_content_fr = ttk.Frame(self.employees_data_fr, padding=15, borderwidth=2, relief='sunken')
-        self.data_content_fr.grid(column=0, row=0)
-        self.data_content_fr.columnconfigure(0, weight=1)
-        self.data_content_fr.rowconfigure(0, weight=1)
+        # Adding a canvas for data_content_fr
+        self.my_canvas = Canvas(self.employees_data_fr)
+        self.my_canvas.grid(column=0, row=0, sticky=(N, S, E, W))
+        self.my_canvas.rowconfigure(0, weight=1)
+        self.my_canvas.columnconfigure(0, weight=1)
+        # Adding scrollbar
+        my_scrollbar = Scrollbar(self.employees_data_fr, orient=VERTICAL, command=self.my_canvas.yview)
+        my_scrollbar.grid(row=0, column=1, sticky=(N,S))
+        # Configure the scrollbar
+        self.my_canvas.configure(yscrollcommand=my_scrollbar.set)
+        self.my_canvas.bind('<Configure>', lambda e: self.my_canvas.configure(scrollregion= self.my_canvas.bbox('all')))
+
+        self.data_content_fr = ttk.Frame(self.my_canvas, padding=15, borderwidth=2, relief='sunken')
+        # packing data cotent frame
+        self.my_canvas.create_window((0,0), window=self.data_content_fr, anchor='nw')
 
         # Go back button
         ttk.Button(self.employees_data_fr, text='Go back', command=lambda: self.destroyLayoutGoBack(self.admin, self.data_content_fr), style='back.TButton').grid(row=1, column=0, sticky=(E,W), pady=15)
