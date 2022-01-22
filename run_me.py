@@ -75,7 +75,29 @@ def createEmployeeTable():
         (521, 'Mukul Roy', 'Male', 39, 35000, 5000, 'Sales'),
         (522, 'Mishti Gupta', 'Female',	21, 15000, 2000, 'Customer Care'),
         (523, 'Yashika Gurjar', 'Female', 30, 25000, 3500, 'HR'),
-        (524, 'Hari Singh Sehkhawat', 'Male', 22, 15000, 2000, 'Customer Care')
+        (524, 'Hari Singh Sehkhawat', 'Male', 22, 15000, 2000, 'Customer Care'),        
+        (525, 'Hari Singh Sehkhawat', 'Male', 22, 15000, 2000, 'Customer Care'),
+        (526, 'Hari Singh Sehkhawat', 'Male', 22, 15000, 2000, 'Customer Care'),
+        (527, 'Hari Singh Sehkhawat', 'Male', 22, 15000, 2000, 'Customer Care'),
+        (528, 'Hari Singh Sehkhawat', 'Male', 22, 15000, 2000, 'Customer Care'),
+        (529, 'Hari Singh Sehkhawat', 'Male', 22, 15000, 2000, 'Customer Care'),
+        (530, 'Hari Singh Sehkhawat', 'Male', 22, 15000, 2000, 'Customer Care'),
+        (532, 'Hari Singh Sehkhawat', 'Male', 22, 15000, 2000, 'Customer Care'),
+        (533, 'Hari Singh Sehkhawat', 'Male', 22, 15000, 2000, 'Customer Care'),
+        (534, 'Hari Singh Sehkhawat', 'Male', 22, 15000, 2000, 'Customer Care'),
+        (535, 'Hari Singh Sehkhawat', 'Male', 22, 15000, 2000, 'Customer Care'),
+        (536, 'Hari Singh Sehkhawat', 'Male', 22, 15000, 2000, 'Customer Care'),
+        (537, 'Hari Singh Sehkhawat', 'Male', 22, 15000, 2000, 'Customer Care'),
+        (538, 'Hari Singh Sehkhawat', 'Male', 22, 15000, 2000, 'Customer Care'),
+        (539, 'Hari Singh Sehkhawat', 'Male', 22, 15000, 2000, 'Customer Care'),
+        (540, 'Hari Singh Sehkhawat', 'Male', 22, 15000, 2000, 'Customer Care'),
+        (541, 'Hari Singh Sehkhawat', 'Male', 22, 15000, 2000, 'Customer Care'),
+        (542, 'Hari Singh Sehkhawat', 'Male', 22, 15000, 2000, 'Customer Care'),
+        (543, 'Hari Singh Sehkhawat', 'Male', 22, 15000, 2000, 'Customer Care'),
+        (544, 'Hari Singh Sehkhawat', 'Male', 22, 15000, 2000, 'Customer Care'),
+        (545, 'Hari Singh Sehkhawat', 'Male', 22, 15000, 2000, 'Customer Care'),
+        (546, 'Hari Singh Sehkhawat', 'Male', 22, 15000, 2000, 'Customer Care'),
+        (547, 'Hari Singh Sehkhawat', 'Male', 22, 15000, 2000, 'Customer Care')
     ]
 
     cursor.executemany(sql, val)
