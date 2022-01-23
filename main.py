@@ -232,6 +232,9 @@ class EmployeeManagement:
         # Go back button
         ttk.Button(addemp_sub_fr, text='Go back', command=lambda: self.goBack(self.admin), style='back.TButton').grid(row=2, column=4, columnspan=3, sticky=(E,W))
 
+        # Final touches
+        for child in addemp_sub_fr.winfo_children():
+            child.grid_configure(padx=10, pady=10)
         # Delete an employee sub frame window
         delemp_sub_fr = ttk.Frame(self.delemp_main_fr, padding=15, borderwidth=2, relief='sunken')
         delemp_sub_fr.grid(column=0, row=0)
